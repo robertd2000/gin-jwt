@@ -2,30 +2,31 @@ package service
 
 import (
 	"context"
+	"go-jwt/internal/domain"
 	"go-jwt/internal/pkg/hash"
 	"go-jwt/internal/repository"
 )
 
 type UserSignUpInput struct {
-	Name         string
-	Email        string
-	Password     string
-	
+	Name     string
+	Email    string
+	Password string
 }
-
 
 type Users interface {
 	SignUp(ctx context.Context, input UserSignUpInput) error
-//	SignIn(ctx context.Context, input UserSignInInput) (Tokens, error)
+	// SignIn(ctx context.Context, input UserSignInInput) (Tokens, error)
+	FindByEmail(email string) (*domain.User, error)
+	FindAll() ([]domain.User, error)
 }
 
 type Services struct {
-	Users          Users
+	Users Users
 }
 
 type Deps struct {
-	Repos                  *repository.Repositories
-	Hasher                 hash.PasswordHasher
+	Repos  *repository.Repositories
+	Hasher hash.PasswordHasher
 }
 
 func NewServices(deps Deps) *Services {

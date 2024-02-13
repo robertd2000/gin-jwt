@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"go-jwt/internal/domain"
 
 	"gorm.io/gorm"
@@ -19,10 +18,17 @@ type UsersRepo struct {
 	db *gorm.DB
 }
 
+func NewUsersRepo(db *gorm.DB) *UsersRepo {
+	return &UsersRepo{
+		db: db,
+	}
+}
+
 func (repo *UsersRepo) Create(_ context.Context, user *domain.User) error {
 	var exists bool
+
 	userDb := repo.db.Model(user).Where("email = ?", user.Email).Find(&exists)
-	fmt.Print(userDb)
+
 	if userDb.Error != nil {
 		return errors.New("user already exists")
 	}
@@ -33,8 +39,24 @@ func (repo *UsersRepo) Create(_ context.Context, user *domain.User) error {
 	return nil
 }
 
-func NewUsersRepo(db *gorm.DB) *UsersRepo {
-	return &UsersRepo{
-		db: db,
+func (repo *UsersRepo) FindByEmail(email string) (*domain.User, error) {
+	var user domain.User
+
+	err := repo.db.First(&user, "email = ?", email).Error
+	if err != nil {
+		return nil, errors.New(err.Error())
 	}
+
+	return &user, nil
+}
+
+func (repo *UsersRepo) FindAll() ([]domain.User, error) {
+	var users []domain.User
+
+	err := repo.db.Find(&users).Error
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return users, nil
 }

@@ -34,6 +34,18 @@ func (s *StudentsService) SignUp(ctx context.Context, input UserSignUpInput) err
 	return nil
 }
 
+func (s *StudentsService) FindByEmail(email string) (*domain.User, error) {
+	user, err := s.repo.FindByEmail(email)
+
+	return user, err
+}
+
+func (s *StudentsService) FindAll() ([]domain.User, error) {
+	users, err := s.repo.FindAll()
+
+	return users, err
+}
+
 func NewUserService(repo repository.User, hasher hash.PasswordHasher) *StudentsService {
 	return &StudentsService{
 		repo,

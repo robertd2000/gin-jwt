@@ -2,10 +2,13 @@ package v1
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/service"
 	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type userSignUpInput struct {
@@ -18,10 +21,50 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
 	{
 		users.POST("/sign-up", h.userSignUp)
-//		users.POST("/sign-in", h.userSignIn)
+		users.GET("/:email", h.getByEmail)
+		users.GET("/", h.getAll)
+		//		users.POST("/sign-in", h.userSignIn)
 
-	
 	}
+}
+
+func (h *Handler) getByEmail(c *gin.Context) {
+	email := c.Param("email")
+
+	user, err := h.services.Users.FindByEmail(email)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": fmt.Sprintf("User with email %s not found", email),
+		})
+
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"status":     200,
+		"user":       user,
+		"request_at": time.Now(),
+	})
+}
+
+func (h *Handler) getAll(c *gin.Context) {
+
+	users, err := h.services.Users.FindAll()
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "Users not found",
+		})
+
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"status":     200,
+		"users":      users,
+		"request_at": time.Now(),
+	})
 }
 
 func (h *Handler) userSignUp(c *gin.Context) {
@@ -36,7 +79,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		Name:     inp.Name,
 		Email:    inp.Email,
 		Password: inp.Password,
-		}); err != nil {
+	}); err != nil {
 		if errors.Is(err, domain.ErrUserAlreadyExists) {
 			newResponse(c, http.StatusBadRequest, err.Error())
 
@@ -46,7 +89,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 
 		return
-		}
+	}
 
-		c.Status(http.StatusCreated)
+	c.Status(http.StatusCreated)
 }
