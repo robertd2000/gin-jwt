@@ -35,8 +35,6 @@ func (h *Handler) getByEmail(c *gin.Context) {
 
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with email %s not found", email))
-
-		return
 	}
 
 	c.JSON(200, user)
@@ -49,8 +47,6 @@ func (h *Handler) getById(c *gin.Context) {
 
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", id))
-
-		return
 	}
 
 	c.JSON(200, user)
