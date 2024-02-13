@@ -6,7 +6,6 @@ import (
 	"go-jwt/internal/domain"
 	"go-jwt/internal/service"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,8 +20,9 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
 	{
 		users.POST("/sign-up", h.userSignUp)
-		users.GET("/:email", h.getByEmail)
 		users.GET("/", h.getAll)
+		users.GET("/email/:email", h.getByEmail)
+		users.GET("/:id", h.getById)
 		//		users.POST("/sign-in", h.userSignIn)
 
 	}
@@ -34,18 +34,26 @@ func (h *Handler) getByEmail(c *gin.Context) {
 	user, err := h.services.Users.FindByEmail(email)
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": fmt.Sprintf("User with email %s not found", email),
-		})
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with email %s not found", email))
 
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"status":     200,
-		"user":       user,
-		"request_at": time.Now(),
-	})
+	c.JSON(200, user)
+}
+
+func (h *Handler) getById(c *gin.Context) {
+	id := c.Param("id")
+
+	user, err := h.services.Users.FindById(id)
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", id))
+
+		return
+	}
+
+	c.JSON(200, user)
 }
 
 func (h *Handler) getAll(c *gin.Context) {
@@ -53,18 +61,10 @@ func (h *Handler) getAll(c *gin.Context) {
 	users, err := h.services.Users.FindAll()
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": "Users not found",
-		})
-
-		return
+		newResponse(c, http.StatusBadRequest, "Users not found")
 	}
 
-	c.JSON(200, gin.H{
-		"status":     200,
-		"users":      users,
-		"request_at": time.Now(),
-	})
+	c.JSON(200, users)
 }
 
 func (h *Handler) userSignUp(c *gin.Context) {

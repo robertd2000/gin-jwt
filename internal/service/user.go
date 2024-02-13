@@ -40,6 +40,12 @@ func (s *StudentsService) FindByEmail(email string) (*domain.User, error) {
 	return user, err
 }
 
+func (s *StudentsService) FindById(id string) (*domain.User, error) {
+	user, err := s.repo.FindById(id)
+
+	return user, err
+}
+
 func (s *StudentsService) FindAll() ([]domain.User, error) {
 	users, err := s.repo.FindAll()
 

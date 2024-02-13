@@ -9,8 +9,9 @@ import (
 
 type User interface {
 	Create(c context.Context, student *domain.User) error
-	FindByEmail(email string) (*domain.User, error)
 	FindAll() ([]domain.User, error)
+	FindByEmail(email string) (*domain.User, error)
+	FindById(id string) (*domain.User, error)
 }
 
 type Repositories struct {

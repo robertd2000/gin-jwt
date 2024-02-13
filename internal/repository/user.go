@@ -50,6 +50,17 @@ func (repo *UsersRepo) FindByEmail(email string) (*domain.User, error) {
 	return &user, nil
 }
 
+func (repo *UsersRepo) FindById(id string) (*domain.User, error) {
+	var user domain.User
+
+	err := repo.db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return &user, nil
+}
+
 func (repo *UsersRepo) FindAll() ([]domain.User, error) {
 	var users []domain.User
 

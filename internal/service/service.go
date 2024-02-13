@@ -16,8 +16,9 @@ type UserSignUpInput struct {
 type Users interface {
 	SignUp(ctx context.Context, input UserSignUpInput) error
 	// SignIn(ctx context.Context, input UserSignInInput) (Tokens, error)
-	FindByEmail(email string) (*domain.User, error)
 	FindAll() ([]domain.User, error)
+	FindByEmail(email string) (*domain.User, error)
+	FindById(id string) (*domain.User, error)
 }
 
 type Services struct {
