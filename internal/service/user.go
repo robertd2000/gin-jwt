@@ -2,9 +2,13 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/pkg/hash"
 	"go-jwt/internal/repository"
+	"os"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -32,6 +36,41 @@ func (s *StudentsService) SignUp(ctx context.Context, input UserSignUpInput) err
 	}
 
 	return nil
+}
+
+func (s *StudentsService) SignIn(_ context.Context, input UserSignInInput) (string, error) {
+	passwordHash, err := s.hasher.Hash(input.Password)
+	if err != nil {
+		fmt.Print("passwordHash", passwordHash)
+
+		return "", err
+	}
+
+	user, err := s.repo.FindByEmail(input.Email)
+	if err != nil {
+		return "", err
+	}
+
+	if user.Password != passwordHash {
+		return "", err
+	}
+
+	payload := jwt.MapClaims{
+		"sub":  input.Email,
+		"exp":  time.Now().Add(time.Hour * 72).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+
+	secretKey := os.Getenv("SECRET_KEY") //
+	var jwtSecretKey = []byte(secretKey)
+
+	t, err := token.SignedString(jwtSecretKey)
+	if err != nil {
+		return "", err
+	}
+
+	return t, nil
 }
 
 func (s *StudentsService) FindByEmail(email string) (*domain.User, error) {
