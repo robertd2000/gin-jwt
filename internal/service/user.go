@@ -3,22 +3,23 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/pkg/hash"
 	"go-jwt/internal/repository"
 	"os"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/google/uuid"
 )
 
-type StudentsService struct {
+type UserService struct {
 	repo   repository.User
 	hasher hash.PasswordHasher
 }
 
-func (s *StudentsService) SignUp(ctx context.Context, input UserSignUpInput) error {
+func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) error {
 	passwordHash, err := s.hasher.Hash(input.Password)
 	if err != nil {
 		return err
@@ -56,8 +57,8 @@ func (s *StudentsService) SignIn(_ context.Context, input UserSignInInput) (stri
 	}
 
 	payload := jwt.MapClaims{
-		"sub":  input.Email,
-		"exp":  time.Now().Add(time.Hour * 72).Unix(),
+		"sub": input.Email,
+		"exp": time.Now().Add(time.Hour * 72).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
@@ -79,20 +80,20 @@ func (s *StudentsService) FindByEmail(email string) (*domain.User, error) {
 	return user, err
 }
 
-func (s *StudentsService) FindById(id string) (*domain.User, error) {
+func (s *UserService) FindById(id string) (*domain.User, error) {
 	user, err := s.repo.FindById(id)
 
 	return user, err
 }
 
-func (s *StudentsService) FindAll() ([]domain.User, error) {
+func (s *UserService) FindAll() ([]domain.User, error) {
 	users, err := s.repo.FindAll()
 
 	return users, err
 }
 
-func NewUserService(repo repository.User, hasher hash.PasswordHasher) *StudentsService {
-	return &StudentsService{
+func NewUserService(repo repository.User, hasher hash.PasswordHasher) *UserService {
+	return &UserService{
 		repo,
 		hasher,
 	}
