@@ -19,24 +19,23 @@ import (
 	"time"
 )
 
-func Init()  {
+func Init() {
 	cfg, err := config.Init("configs")
 	if err != nil {
 		print("error")
 	}
-	
+
 	initializers.LoadEnv()
 	db := initializers.ConnectToDb()
 	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
-	fmt.Println("hasher")
-	
+
 	repos := repository.NewRepositories(db)
 	services := service.NewServices(service.Deps{
-		Repos:                  repos,
-		Hasher:                 hasher,
-		})
+		Repos:  repos,
+		Hasher: hasher,
+	})
 	handlers := delivery.NewHandler(services)
-	
+
 	srv := server.NewServer(cfg, handlers.Init(cfg))
 
 	go func() {

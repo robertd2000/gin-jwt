@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/pkg/hash"
 	"go-jwt/internal/repository"
@@ -42,8 +41,6 @@ func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) error {
 func (s *UserService) SignIn(_ context.Context, input UserSignInInput) (string, error) {
 	passwordHash, err := s.hasher.Hash(input.Password)
 	if err != nil {
-		fmt.Print("passwordHash", passwordHash)
-
 		return "", err
 	}
 
