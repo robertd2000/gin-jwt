@@ -39,7 +39,7 @@ func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) error {
 	return nil
 }
 
-func (s *StudentsService) SignIn(_ context.Context, input UserSignInInput) (string, error) {
+func (s *UserService) SignIn(_ context.Context, input UserSignInInput) (string, error) {
 	passwordHash, err := s.hasher.Hash(input.Password)
 	if err != nil {
 		fmt.Print("passwordHash", passwordHash)
@@ -74,7 +74,7 @@ func (s *StudentsService) SignIn(_ context.Context, input UserSignInInput) (stri
 	return t, nil
 }
 
-func (s *StudentsService) FindByEmail(email string) (*domain.User, error) {
+func (s *UserService) FindByEmail(email string) (*domain.User, error) {
 	user, err := s.repo.FindByEmail(email)
 
 	return user, err
