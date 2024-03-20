@@ -19,7 +19,7 @@ type Repositories struct {
 }
 
 func NewRepositories(db *gorm.DB) *Repositories {
-	db.AutoMigrate(&domain.User{})
+	db.AutoMigrate(&domain.User{}, &domain.Object{})
 
 	return &Repositories{
 		NewUsersRepo(db),
