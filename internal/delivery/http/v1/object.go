@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"go-jwt/internal/service"
 	"net/http"
 
@@ -21,12 +22,14 @@ type objectCreateInput struct {
 func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	users := api.Group("/objects")
 	{
-		users.POST("/create", h.CreateObject)
-
+		users.GET("/", h.getObjectsAll)
+		users.GET("/:id", h.getObjectById)
+		users.GET("/user/:userId", h.getObjectByUserId)
+		users.POST("/create", h.createObject)
 	}
 }
 
-func (h *Handler) CreateObject(c *gin.Context) {
+func (h *Handler) createObject(c *gin.Context) {
 	var object objectCreateInput
 
 	if err := c.BindJSON(&object); err != nil {
@@ -50,4 +53,39 @@ func (h *Handler) CreateObject(c *gin.Context) {
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+func (h *Handler) getObjectsAll(c *gin.Context) {
+	objects, err := h.services.Objects.FindAll()
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, "Objects not found")
+
+	}
+
+	c.JSON(http.StatusOK, objects)
+}
+
+func (h *Handler) getObjectById(c *gin.Context) {
+	id := c.Param("id")
+
+	object, err := h.services.Objects.FindById(id)
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("Object with id %s not found", id))
+	}
+
+	c.JSON(http.StatusOK, object)
+}
+
+func (h *Handler) getObjectByUserId(c *gin.Context) {
+	userId := c.Param("userId")
+
+	objects, err := h.services.Objects.FindByUserId(userId)
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", userId))
+	}
+
+	c.JSON(http.StatusOK, objects)
 }

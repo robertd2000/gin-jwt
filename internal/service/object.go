@@ -50,3 +50,15 @@ func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInpu
 
 	return nil
 }
+
+func (s *ObjectService) FindAll() ([]domain.Object, error) {
+	return s.objectRepo.FindAll()
+}
+
+func (s *ObjectService) FindById(id string) (*domain.Object, error) {
+	return s.objectRepo.FindById(id)
+}
+
+func (s *ObjectService) FindByUserId(userId string) ([]domain.Object, error) {
+	return s.objectRepo.FindByUserId(userId)
+}

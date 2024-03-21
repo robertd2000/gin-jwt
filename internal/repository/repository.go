@@ -19,6 +19,7 @@ type Object interface {
 	Create(c context.Context, object *domain.Object) error
 	FindAll() ([]domain.Object, error)
 	FindById(id string) (*domain.Object, error)
+	FindByUserId(userId string) ([]domain.Object, error)
 }
 
 type Repositories struct {
