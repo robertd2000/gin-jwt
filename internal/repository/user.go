@@ -64,10 +64,16 @@ func (repo *UsersRepo) FindById(id string) (*domain.User, error) {
 func (repo *UsersRepo) FindAll() ([]domain.User, error) {
 	var users []domain.User
 
-	err := repo.db.Find(&users).Error
+	err := repo.db.Model(&domain.User{}).Preload("Objects").Find(&users).Error
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
 
 	return users, nil
+}
+
+func (repo *UsersRepo) AddObject(user domain.User, object domain.Object) error {
+	repo.db.Model(&user).Association("Languages").Append(object)
+
+	return nil
 }

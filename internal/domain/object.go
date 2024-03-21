@@ -18,5 +18,6 @@ type Object struct {
 	Radius      int       `json:"radius" bson:"radius"`
 	Description string    `json:"description" bson:"description"`
 	Color       string    `json:"color" bson:"color"`
-	UserID      uuid.UUID `json:"userId" bson:"userId" gorm:"type:uuid"`
+	UserID      uuid.UUID `json:"userId" bson:"userId" gorm:"type:uuid;index"`
+	User        User
 }

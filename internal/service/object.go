@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/repository"
 
@@ -10,17 +9,24 @@ import (
 )
 
 type ObjectService struct {
-	repo repository.Object
+	objectRepo repository.Object
+	userRepo   repository.User
 }
 
-func NewObjectService(repo repository.Object) *ObjectService {
+func NewObjectService(objectRepo repository.Object, userEepo repository.User) *ObjectService {
 	return &ObjectService{
-		repo,
+		objectRepo,
+		userEepo,
 	}
 }
 
 func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInput) error {
-	fmt.Println("objectInput", objectInput)
+	user, err := s.userRepo.FindById(objectInput.UserID.String())
+
+	if err != nil {
+		return err
+	}
+
 	object := domain.Object{
 		ID:          uuid.New(),
 		Name:        objectInput.Name,
@@ -30,9 +36,15 @@ func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInpu
 		Description: objectInput.Description,
 		Color:       objectInput.Color,
 		UserID:      objectInput.UserID,
+		User:        *user,
 	}
 
-	if err := s.repo.Create(ctx, &object); err != nil {
+	err = s.userRepo.AddObject(*user, object)
+	if err != nil {
+		return err
+	}
+
+	if err := s.objectRepo.Create(ctx, &object); err != nil {
 		return err
 	}
 

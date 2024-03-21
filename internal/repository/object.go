@@ -24,8 +24,6 @@ func (repo *ObjectRepo) Create(_ context.Context, object *domain.Object) error {
 		return errors.New(res.Error.Error())
 	}
 
-	repo.db.Save(&object)
-
 	return nil
 
 }

@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"go-jwt/internal/service"
 	"net/http"
 
@@ -35,8 +34,6 @@ func (h *Handler) CreateObject(c *gin.Context) {
 
 		return
 	}
-
-	fmt.Println(object)
 
 	if err := h.services.Objects.Create(c.Request.Context(), service.ObjectCreateInput{
 		Name:        object.Name,

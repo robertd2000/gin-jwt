@@ -58,7 +58,7 @@ type Deps struct {
 
 func NewServices(deps Deps) *Services {
 	userService := NewUserService(deps.Repos.User, deps.Hasher)
-	objectService := NewObjectService(deps.Repos.Object)
+	objectService := NewObjectService(deps.Repos.Object, deps.Repos.User)
 	return &Services{
 		Users:   userService,
 		Objects: objectService,
