@@ -58,3 +58,7 @@ func (s *ObjectService) FindAll() ([]domain.Object, error) {
 func (s *ObjectService) FindById(id string) (*domain.Object, error) {
 	return s.objectRepo.FindById(id)
 }
+
+func (s *ObjectService) FindByUserId(userId string) ([]domain.Object, error) {
+	return s.objectRepo.FindByUserId(userId)
+}

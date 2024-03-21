@@ -49,3 +49,14 @@ func (repo *ObjectRepo) FindById(id string) (*domain.Object, error) {
 
 	return &object, nil
 }
+
+func (repo *ObjectRepo) FindByUserId(userId string) ([]domain.Object, error) {
+	var objects []domain.Object
+
+	err := repo.db.Where("user_id = ?", userId).Find(&objects).Error
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return objects, nil
+}

@@ -53,7 +53,7 @@ func (repo *UsersRepo) FindByEmail(email string) (*domain.User, error) {
 func (repo *UsersRepo) FindById(id string) (*domain.User, error) {
 	var user domain.User
 
-	err := repo.db.Where("id = ?", id).First(&user).Error
+	err := repo.db.Model(&domain.User{}).Preload("Objects").Where("id = ?", id).First(&user).Error
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}

@@ -24,6 +24,7 @@ func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	{
 		users.GET("/", h.getObjectsAll)
 		users.GET("/:id", h.getObjectById)
+		users.GET("/user/:userId", h.getObjectByUserId)
 		users.POST("/create", h.createObject)
 	}
 }
@@ -71,8 +72,20 @@ func (h *Handler) getObjectById(c *gin.Context) {
 	object, err := h.services.Objects.FindById(id)
 
 	if err != nil {
-		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", id))
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("Object with id %s not found", id))
 	}
 
 	c.JSON(http.StatusOK, object)
+}
+
+func (h *Handler) getObjectByUserId(c *gin.Context) {
+	userId := c.Param("userId")
+
+	objects, err := h.services.Objects.FindByUserId(userId)
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", userId))
+	}
+
+	c.JSON(http.StatusOK, objects)
 }

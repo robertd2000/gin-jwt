@@ -46,6 +46,7 @@ type Objects interface {
 	Create(ctx context.Context, objectInput ObjectCreateInput) error
 	FindAll() ([]domain.Object, error)
 	FindById(id string) (*domain.Object, error)
+	FindByUserId(userId string) ([]domain.Object, error)
 }
 
 type Services struct {
