@@ -5,6 +5,8 @@ import (
 	"go-jwt/internal/domain"
 	"go-jwt/internal/pkg/hash"
 	"go-jwt/internal/repository"
+
+	"github.com/google/uuid"
 )
 
 type UserSignUpInput struct {
@@ -19,19 +21,34 @@ type UserSignInInput struct {
 }
 
 type UserSignInResponse struct {
-	 Token string
+	Token string
+}
+
+type ObjectCreateInput struct {
+	Name        string
+	Type        int
+	Coords      string
+	Radius      int
+	Description string
+	Color       string
+	UserID      uuid.UUID
 }
 
 type Users interface {
 	SignUp(ctx context.Context, input UserSignUpInput) error
-	SignIn(ctx context.Context, input UserSignInInput)  (string, error)
+	SignIn(ctx context.Context, input UserSignInInput) (string, error)
 	FindAll() ([]domain.User, error)
 	FindByEmail(email string) (*domain.User, error)
 	FindById(id string) (*domain.User, error)
 }
 
+type Objects interface {
+	Create(ctx context.Context, objectInput ObjectCreateInput) error
+}
+
 type Services struct {
-	Users Users
+	Users   Users
+	Objects Objects
 }
 
 type Deps struct {
@@ -41,7 +58,9 @@ type Deps struct {
 
 func NewServices(deps Deps) *Services {
 	userService := NewUserService(deps.Repos.User, deps.Hasher)
+	objectService := NewObjectService(deps.Repos.Object, deps.Repos.User)
 	return &Services{
-		Users: userService,
+		Users:   userService,
+		Objects: objectService,
 	}
 }

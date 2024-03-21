@@ -23,7 +23,7 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 		users.GET("/", h.getAll)
 		users.GET("/email/:email", h.getByEmail)
 		users.GET("/:id", h.getById)
-				users.POST("/sign-in", h.userSignIn)
+		users.POST("/sign-in", h.userSignIn)
 
 	}
 }
@@ -101,7 +101,7 @@ func (h *Handler) userSignIn(c *gin.Context) {
 	t, err := h.services.Users.SignIn(c.Request.Context(), service.UserSignInInput{
 		Email:    inp.Email,
 		Password: inp.Password,
-		})
+	})
 
 	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
@@ -110,7 +110,6 @@ func (h *Handler) userSignIn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, service.UserSignInResponse{
-	t,
+		Token: t,
 	})
-
 }

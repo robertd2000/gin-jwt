@@ -18,6 +18,13 @@ type UserService struct {
 	hasher hash.PasswordHasher
 }
 
+func NewUserService(repo repository.User, hasher hash.PasswordHasher) *UserService {
+	return &UserService{
+		repo,
+		hasher,
+	}
+}
+
 func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) error {
 	passwordHash, err := s.hasher.Hash(input.Password)
 	if err != nil {
@@ -87,11 +94,4 @@ func (s *UserService) FindAll() ([]domain.User, error) {
 	users, err := s.repo.FindAll()
 
 	return users, err
-}
-
-func NewUserService(repo repository.User, hasher hash.PasswordHasher) *UserService {
-	return &UserService{
-		repo,
-		hasher,
-	}
 }
