@@ -54,3 +54,7 @@ func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInpu
 func (s *ObjectService) FindAll() ([]domain.Object, error) {
 	return s.objectRepo.FindAll()
 }
+
+func (s *ObjectService) FindById(id string) (*domain.Object, error) {
+	return s.objectRepo.FindById(id)
+}

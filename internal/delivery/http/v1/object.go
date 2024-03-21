@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"go-jwt/internal/service"
 	"net/http"
 
@@ -22,8 +23,8 @@ func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	users := api.Group("/objects")
 	{
 		users.GET("/", h.getObjectsAll)
+		users.GET("/:id", h.getObjectById)
 		users.POST("/create", h.createObject)
-
 	}
 }
 
@@ -62,4 +63,16 @@ func (h *Handler) getObjectsAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, objects)
+}
+
+func (h *Handler) getObjectById(c *gin.Context) {
+	id := c.Param("id")
+
+	object, err := h.services.Objects.FindById(id)
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", id))
+	}
+
+	c.JSON(http.StatusOK, object)
 }

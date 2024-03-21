@@ -40,5 +40,12 @@ func (repo *ObjectRepo) FindAll() ([]domain.Object, error) {
 }
 
 func (repo *ObjectRepo) FindById(id string) (*domain.Object, error) {
-	return &domain.Object{}, nil
+	var object domain.Object
+
+	err := repo.db.Where("id = ?", id).First(&object).Error
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return &object, nil
 }
