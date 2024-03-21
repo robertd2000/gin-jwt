@@ -60,7 +60,7 @@ func (h *Handler) getAll(c *gin.Context) {
 		newResponse(c, http.StatusBadRequest, "Users not found")
 	}
 
-	c.JSON(200, users)
+	c.JSON(http.StatusOK, users)
 }
 
 func (h *Handler) userSignUp(c *gin.Context) {

@@ -44,6 +44,7 @@ type Users interface {
 
 type Objects interface {
 	Create(ctx context.Context, objectInput ObjectCreateInput) error
+	FindAll() ([]domain.Object, error)
 }
 
 type Services struct {

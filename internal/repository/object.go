@@ -29,7 +29,14 @@ func (repo *ObjectRepo) Create(_ context.Context, object *domain.Object) error {
 }
 
 func (repo *ObjectRepo) FindAll() ([]domain.Object, error) {
-	return []domain.Object{}, nil
+	var objects []domain.Object
+
+	err := repo.db.Model(&domain.Object{}).Preload("User").Find(&objects).Error
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return objects, nil
 }
 
 func (repo *ObjectRepo) FindById(id string) (*domain.Object, error) {

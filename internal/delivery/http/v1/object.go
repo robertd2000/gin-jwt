@@ -21,12 +21,13 @@ type objectCreateInput struct {
 func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	users := api.Group("/objects")
 	{
-		users.POST("/create", h.CreateObject)
+		users.GET("/", h.getObjectsAll)
+		users.POST("/create", h.createObject)
 
 	}
 }
 
-func (h *Handler) CreateObject(c *gin.Context) {
+func (h *Handler) createObject(c *gin.Context) {
 	var object objectCreateInput
 
 	if err := c.BindJSON(&object); err != nil {
@@ -50,4 +51,15 @@ func (h *Handler) CreateObject(c *gin.Context) {
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+func (h *Handler) getObjectsAll(c *gin.Context) {
+	objects, err := h.services.Objects.FindAll()
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, "Objects not found")
+
+	}
+
+	c.JSON(http.StatusOK, objects)
 }
