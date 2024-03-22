@@ -13,6 +13,7 @@ type User interface {
 	FindByEmail(email string) (*domain.User, error)
 	FindById(id string) (*domain.User, error)
 	AddObject(user domain.User, object domain.Object) error
+	Delete(userId string) error
 }
 
 type Object interface {

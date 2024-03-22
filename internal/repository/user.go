@@ -77,3 +77,12 @@ func (repo *UsersRepo) AddObject(user domain.User, object domain.Object) error {
 
 	return nil
 }
+
+func (repo *UsersRepo) Delete(userId string) error {
+	res := repo.db.Where("id = ?", userId).Delete(&domain.User{})
+	if res.Error != nil {
+		return errors.New(res.Error.Error())
+	}
+
+	return nil
+}
