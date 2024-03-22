@@ -11,5 +11,5 @@ type User struct {
 	Name     string    `json:"name" bson:"name" gorm:"UNIQUE_INDEX:compositeindex;index"`
 	Email    string    `json:"email" bson:"email" gorm:"UNIQUE_INDEX:compositeindex;index"`
 	Password string    `json:"-" bson:"password" gorm:"UNIQUE_INDEX:compositeindex;index"`
-	Objects  []Object  `json:"objects" bson:"objects" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Objects  []Object  `json:"objects" bson:"objects" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

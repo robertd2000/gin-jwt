@@ -95,3 +95,7 @@ func (s *UserService) FindAll() ([]domain.User, error) {
 
 	return users, err
 }
+
+func (s *UserService) Delete(userId string) error {
+	return s.repo.Delete(userId)
+}

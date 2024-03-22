@@ -20,10 +20,11 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
 	{
 		users.POST("/sign-up", h.userSignUp)
+		users.POST("/sign-in", h.userSignIn)
 		users.GET("/", h.getAll)
 		users.GET("/email/:email", h.getByEmail)
 		users.GET("/:id", h.getById)
-		users.POST("/sign-in", h.userSignIn)
+		users.DELETE("/:id", h.deleteUser)
 
 	}
 }
@@ -112,4 +113,17 @@ func (h *Handler) userSignIn(c *gin.Context) {
 	c.JSON(http.StatusOK, service.UserSignInResponse{
 		Token: t,
 	})
+}
+
+func (h *Handler) deleteUser(c *gin.Context) {
+	id := c.Param("id")
+
+	err := h.services.Users.Delete(id)
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", id))
+	}
+
+	c.Status(http.StatusCreated)
+
 }

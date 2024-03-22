@@ -13,6 +13,7 @@ type User interface {
 	FindByEmail(email string) (*domain.User, error)
 	FindById(id string) (*domain.User, error)
 	AddObject(user domain.User, object domain.Object) error
+	Delete(userId string) error
 }
 
 type Object interface {
@@ -21,6 +22,7 @@ type Object interface {
 	FindById(id string) (*domain.Object, error)
 	FindByUserId(userId string) ([]domain.Object, error)
 	Delete(objectId string) error
+	DeleteByUserId(userId string) error
 }
 
 type Repositories struct {

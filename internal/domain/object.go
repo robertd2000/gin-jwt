@@ -19,5 +19,5 @@ type Object struct {
 	Description string    `json:"description" bson:"description"`
 	Color       string    `json:"color" bson:"color"`
 	UserID      uuid.UUID `json:"userId" bson:"userId" gorm:"type:uuid;index"`
-	User        User
+	User        User      `json:"user" bson:"user" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

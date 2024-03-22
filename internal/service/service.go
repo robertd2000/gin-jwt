@@ -40,6 +40,7 @@ type Users interface {
 	FindAll() ([]domain.User, error)
 	FindByEmail(email string) (*domain.User, error)
 	FindById(id string) (*domain.User, error)
+	Delete(userId string) error
 }
 
 type Objects interface {
