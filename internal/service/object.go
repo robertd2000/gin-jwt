@@ -51,6 +51,10 @@ func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInpu
 	return nil
 }
 
+func (s *ObjectService) Delete(objectId string) error {
+	return s.objectRepo.Delete(objectId)
+}
+
 func (s *ObjectService) FindAll() ([]domain.Object, error) {
 	return s.objectRepo.FindAll()
 }

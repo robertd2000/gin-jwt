@@ -20,6 +20,7 @@ type Object interface {
 	FindAll() ([]domain.Object, error)
 	FindById(id string) (*domain.Object, error)
 	FindByUserId(userId string) ([]domain.Object, error)
+	Delete(objectId string) error
 }
 
 type Repositories struct {

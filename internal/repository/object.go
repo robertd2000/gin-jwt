@@ -60,3 +60,12 @@ func (repo *ObjectRepo) FindByUserId(userId string) ([]domain.Object, error) {
 
 	return objects, nil
 }
+
+func (repo *ObjectRepo) Delete(objectId string) error {
+	res := repo.db.Where("id = ?", objectId).Delete(&domain.Object{})
+	if res.Error != nil {
+		return errors.New(res.Error.Error())
+	}
+
+	return nil
+}

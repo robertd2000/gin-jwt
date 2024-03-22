@@ -26,6 +26,7 @@ func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 		users.GET("/:id", h.getObjectById)
 		users.GET("/user/:userId", h.getObjectByUserId)
 		users.POST("/create", h.createObject)
+		users.DELETE("/:id", h.deleteObject)
 	}
 }
 
@@ -88,4 +89,16 @@ func (h *Handler) getObjectByUserId(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, objects)
+}
+
+func (h *Handler) deleteObject(c *gin.Context) {
+	id := c.Param("id")
+
+	err := h.services.Objects.Delete(id)
+
+	if err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("Object with id %s not found", id))
+	}
+
+	c.Status(http.StatusCreated)
 }
