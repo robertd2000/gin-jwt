@@ -69,3 +69,12 @@ func (repo *ObjectRepo) Delete(objectId string) error {
 
 	return nil
 }
+
+func (repo *ObjectRepo) DeleteByUserId(userId string) error {
+	res := repo.db.Where("user_id = ?", userId).Delete(&domain.Object{})
+	if res.Error != nil {
+		return errors.New(res.Error.Error())
+	}
+
+	return nil
+}

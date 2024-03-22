@@ -22,6 +22,7 @@ type Object interface {
 	FindById(id string) (*domain.Object, error)
 	FindByUserId(userId string) ([]domain.Object, error)
 	Delete(objectId string) error
+	DeleteByUserId(userId string) error
 }
 
 type Repositories struct {

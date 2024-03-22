@@ -84,5 +84,10 @@ func (repo *UsersRepo) Delete(userId string) error {
 		return errors.New(res.Error.Error())
 	}
 
+	res = repo.db.Where("user_id = ?", userId).Delete(&domain.Object{})
+	if res.Error != nil {
+		return errors.New(res.Error.Error())
+	}
+
 	return nil
 }
