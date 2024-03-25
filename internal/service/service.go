@@ -34,6 +34,17 @@ type ObjectCreateInput struct {
 	UserID      uuid.UUID
 }
 
+type ObjectUpdateInput struct {
+	ID          uuid.UUID
+	Name        string
+	Type        int
+	Coords      string
+	Radius      int
+	Description string
+	Color       string
+	UserID      uuid.UUID
+}
+
 type Users interface {
 	SignUp(ctx context.Context, input UserSignUpInput) error
 	SignIn(ctx context.Context, input UserSignInInput) (string, error)
@@ -45,6 +56,7 @@ type Users interface {
 
 type Objects interface {
 	Create(ctx context.Context, objectInput ObjectCreateInput) error
+	Update(ctx context.Context, objectInput ObjectUpdateInput) error
 	FindAll() ([]domain.Object, error)
 	FindById(id string) (*domain.Object, error)
 	FindByUserId(userId string) ([]domain.Object, error)
