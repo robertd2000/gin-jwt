@@ -19,13 +19,25 @@ type objectCreateInput struct {
 	UserID      uuid.UUID `json:"userId" bson:"userId"`
 }
 
+type objectUpdateInput struct {
+	ID          uuid.UUID `json:"id" bson:"id"`
+	Name        string    `json:"name" binding:"required,min=2,max=64"`
+	Type        int       `json:"type" bson:"type"`
+	Coords      string    `json:"coords" bson:"coords"`
+	Radius      int       `json:"radius" bson:"radius"`
+	Description string    `json:"description" bson:"description"`
+	Color       string    `json:"color" bson:"color"`
+	UserID      uuid.UUID `json:"userId" bson:"userId"`
+}
+
 func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	users := api.Group("/objects")
 	{
 		users.GET("/", h.getObjectsAll)
 		users.GET("/:id", h.getObjectById)
 		users.GET("/user/:userId", h.getObjectByUserId)
-		users.POST("/create", h.createObject)
+		users.POST("/", h.createObject)
+		users.PUT("/", h.updateObject)
 		users.DELETE("/:id", h.deleteObject)
 	}
 }
@@ -40,6 +52,33 @@ func (h *Handler) createObject(c *gin.Context) {
 	}
 
 	if err := h.services.Objects.Create(c.Request.Context(), service.ObjectCreateInput{
+		Name:        object.Name,
+		Type:        object.Type,
+		Coords:      object.Coords,
+		Radius:      object.Radius,
+		Description: object.Description,
+		Color:       object.Color,
+		UserID:      object.UserID,
+	}); err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.Status(http.StatusCreated)
+}
+
+func (h *Handler) updateObject(c *gin.Context) {
+	var object objectUpdateInput
+
+	if err := c.BindJSON(&object); err != nil {
+		newResponse(c, http.StatusBadRequest, "invalid input body")
+
+		return
+	}
+
+	if err := h.services.Objects.Update(c.Request.Context(), service.ObjectUpdateInput{
+		ID:          object.ID,
 		Name:        object.Name,
 		Type:        object.Type,
 		Coords:      object.Coords,

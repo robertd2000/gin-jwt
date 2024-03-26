@@ -51,6 +51,37 @@ func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInpu
 	return nil
 }
 
+func (s *ObjectService) Update(ctx context.Context, objectInput ObjectUpdateInput) error {
+	user, err := s.userRepo.FindById(objectInput.UserID.String())
+
+	if err != nil {
+		return err
+	}
+
+	object := domain.Object{
+		ID:          objectInput.ID,
+		Name:        objectInput.Name,
+		Type:        objectInput.Type,
+		Coords:      objectInput.Coords,
+		Radius:      objectInput.Radius,
+		Description: objectInput.Description,
+		Color:       objectInput.Color,
+		UserID:      objectInput.UserID,
+		User:        *user,
+	}
+
+	// err = s.userRepo.AddObject(*user, object)
+	// if err != nil {
+	// 	return err
+	// }
+
+	if err := s.objectRepo.Update(ctx, &object); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *ObjectService) Delete(objectId string) error {
 	return s.objectRepo.Delete(objectId)
 }

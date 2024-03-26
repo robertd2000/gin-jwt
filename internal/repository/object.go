@@ -28,6 +28,16 @@ func (repo *ObjectRepo) Create(_ context.Context, object *domain.Object) error {
 
 }
 
+func (repo *ObjectRepo) Update(_ context.Context, object *domain.Object) error {
+	res := repo.db.Save(&object)
+	if res.Error != nil {
+		return errors.New(res.Error.Error())
+	}
+
+	return nil
+
+}
+
 func (repo *ObjectRepo) FindAll() ([]domain.Object, error) {
 	var objects []domain.Object
 
