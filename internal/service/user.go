@@ -78,6 +78,22 @@ func (s *UserService) SignIn(_ context.Context, input UserSignInInput) (string, 
 	return t, nil
 }
 
+func (s *UserService) Update(ctx context.Context, input UserUpdateInput) error {
+	user, err := s.repo.FindById(input.ID.String())
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.Update(ctx, &domain.User{
+		ID:       user.ID,
+		Name:     input.Name,
+		Email:    input.Email,
+		Password: user.Password,
+	})
+
+	return err
+}
+
 func (s *UserService) FindByEmail(email string) (*domain.User, error) {
 	user, err := s.repo.FindByEmail(email)
 

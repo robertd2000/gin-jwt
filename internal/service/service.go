@@ -20,6 +20,12 @@ type UserSignInInput struct {
 	Password string
 }
 
+type UserUpdateInput struct {
+	ID    uuid.UUID
+	Email string
+	Name  string
+}
+
 type UserSignInResponse struct {
 	Token string
 }
@@ -51,6 +57,7 @@ type Users interface {
 	FindAll() ([]domain.User, error)
 	FindByEmail(email string) (*domain.User, error)
 	FindById(id string) (*domain.User, error)
+	Update(ctx context.Context, input UserUpdateInput) error
 	Delete(userId string) error
 }
 
