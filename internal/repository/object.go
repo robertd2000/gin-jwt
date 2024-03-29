@@ -35,7 +35,6 @@ func (repo *ObjectRepo) Update(_ context.Context, object *domain.Object) error {
 	}
 
 	return nil
-
 }
 
 func (repo *ObjectRepo) FindAll() ([]domain.Object, error) {

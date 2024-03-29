@@ -9,6 +9,7 @@ import (
 
 type User interface {
 	Create(c context.Context, user *domain.User) error
+	Update(_ context.Context, user *domain.User) error
 	FindAll() ([]domain.User, error)
 	FindByEmail(email string) (*domain.User, error)
 	FindById(id string) (*domain.User, error)

@@ -39,6 +39,16 @@ func (repo *UsersRepo) Create(_ context.Context, user *domain.User) error {
 	return nil
 }
 
+func (repo *UsersRepo) Update(_ context.Context, user *domain.User) error {
+	res := repo.db.Save(&user)
+
+	if res.Error != nil {
+		return errors.New(res.Error.Error())
+	}
+
+	return nil
+}
+
 func (repo *UsersRepo) FindByEmail(email string) (*domain.User, error) {
 	var user domain.User
 

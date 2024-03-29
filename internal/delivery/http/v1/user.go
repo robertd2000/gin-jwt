@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type userSignUpInput struct {
@@ -16,12 +17,19 @@ type userSignUpInput struct {
 	Password string `json:"password" binding:"required,min=8,max=64"`
 }
 
+type userUpdateInput struct {
+	ID    uuid.UUID `json:"id" binding:"required"`
+	Name  string    `json:"name" binding:"required,min=2,max=64"`
+	Email string    `json:"email" binding:"required,email,max=64"`
+}
+
 func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
 	{
 		users.POST("/sign-up", h.userSignUp)
 		users.POST("/sign-in", h.userSignIn)
 		users.GET("/", h.getAll)
+		users.PUT("/", h.updateUser)
 		users.GET("/email/:email", h.getByEmail)
 		users.GET("/:id", h.getById)
 		users.DELETE("/:id", h.deleteUser)
@@ -113,6 +121,31 @@ func (h *Handler) userSignIn(c *gin.Context) {
 	c.JSON(http.StatusOK, service.UserSignInResponse{
 		Token: t,
 	})
+}
+
+func (h *Handler) updateUser(c *gin.Context) {
+	var inp userUpdateInput
+
+	if err := c.BindJSON(&inp); err != nil {
+		newResponse(c, http.StatusBadRequest, "invalid input body")
+
+		return
+	}
+
+	err := h.services.Users.Update(c.Request.Context(), service.UserUpdateInput{
+		ID:    inp.ID,
+		Name:  inp.Name,
+		Email: inp.Email,
+	})
+
+	if err != nil {
+		newResponse(c, http.StatusInternalServerError, err.Error())
+
+		return
+	}
+
+	c.Status(http.StatusOK)
+
 }
 
 func (h *Handler) deleteUser(c *gin.Context) {
