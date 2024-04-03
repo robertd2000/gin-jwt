@@ -25,28 +25,47 @@ func NewUserService(repo repository.User, hasher hash.PasswordHasher) *UserServi
 	}
 }
 
-func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) error {
+// SignUp is a function that handles user sign up.
+// It takes in a context.Context object, UserSignUpInput, and returns an error.
+// This function hashes the password, creates a new user domain object, and saves it to the repository.
+func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) (string, error) {
+	// Hash the password
 	passwordHash, err := s.hasher.Hash(input.Password)
 	if err != nil {
-		return err
+		return "",err
 	}
 
+	// Create a new user domain object
 	student := domain.User{
 		Name:     input.Name,
 		Password: passwordHash,
 		Email:    input.Email,
-		ID:       uuid.New(),
+		ID:       uuid.New(), // Generate a new UUID
 	}
 
-	if err := s.repo.Create(ctx, &student); err != nil {
-		return err
+	// Save the user to the repository
+
+	id, err := s.repo.Create(ctx, &student)
+
+	if err != nil {
+		return "",err
 	}
 
-	return nil
+	return id.String(), nil
 }
 
-func (s *UserService) SignIn(_ context.Context, input UserSignInInput) (string, error) {
-	passwordHash, err := s.hasher.Hash(input.Password)
+// SignIn authenticates a user and generates a JSON Web Token (JWT).
+// The JWT contains the user's email as the subject and expires in 72 hours.
+//
+// Parameters:
+// - ctx: The context.Context object for handling the request.
+// - input: The UserSignInInput object containing the user's email and password.
+//
+// Returns:
+// - string: The generated JWT if the sign in is successful.
+// - error: An error if the sign in is not successful.
+func (s *UserService) SignIn(ctx context.Context, input UserSignInInput) (string, error) {
+	hashedPassword, err := s.hasher.Hash(input.Password)
 	if err != nil {
 		return "", err
 	}
@@ -56,30 +75,30 @@ func (s *UserService) SignIn(_ context.Context, input UserSignInInput) (string, 
 		return "", err
 	}
 
-	if user.Password != passwordHash {
+	if user.Password != hashedPassword {
 		return "", err
 	}
 
+	expirationTime := time.Now().Add(time.Hour * 72)
 	payload := jwt.MapClaims{
 		"sub": input.Email,
-		"exp": time.Now().Add(time.Hour * 72).Unix(),
+		"exp": expirationTime.Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	secretKey := os.Getenv("SECRET_KEY")
+	jwtSecret := []byte(secretKey)
 
-	secretKey := os.Getenv("SECRET_KEY") //
-	var jwtSecretKey = []byte(secretKey)
-
-	t, err := token.SignedString(jwtSecretKey)
+	signedToken, err := token.SignedString(jwtSecret)
 	if err != nil {
 		return "", err
 	}
 
-	return t, nil
+	return signedToken, nil
 }
 
 func (s *UserService) Update(ctx context.Context, input UserUpdateInput) error {
-	user, err := s.repo.FindById(input.ID.String())
+	user, err := s.repo.FindByID(input.ID.String())
 	if err != nil {
 		return err
 	}
@@ -101,7 +120,7 @@ func (s *UserService) FindByEmail(email string) (*domain.User, error) {
 }
 
 func (s *UserService) FindById(id string) (*domain.User, error) {
-	user, err := s.repo.FindById(id)
+	user, err := s.repo.FindByID(id)
 
 	return user, err
 }

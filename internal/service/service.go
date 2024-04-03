@@ -52,7 +52,7 @@ type ObjectUpdateInput struct {
 }
 
 type Users interface {
-	SignUp(ctx context.Context, input UserSignUpInput) error
+	SignUp(ctx context.Context, input UserSignUpInput) (string, error)
 	SignIn(ctx context.Context, input UserSignInInput) (string, error)
 	FindAll() ([]domain.User, error)
 	FindByEmail(email string) (*domain.User, error)

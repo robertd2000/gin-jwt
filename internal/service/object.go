@@ -21,7 +21,7 @@ func NewObjectService(objectRepo repository.Object, userEepo repository.User) *O
 }
 
 func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInput) error {
-	user, err := s.userRepo.FindById(objectInput.UserID.String())
+	user, err := s.userRepo.FindByID(objectInput.UserID.String())
 
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (s *ObjectService) Create(ctx context.Context, objectInput ObjectCreateInpu
 }
 
 func (s *ObjectService) Update(ctx context.Context, objectInput ObjectUpdateInput) error {
-	user, err := s.userRepo.FindById(objectInput.UserID.String())
+	user, err := s.userRepo.FindByID(objectInput.UserID.String())
 
 	if err != nil {
 		return err

@@ -31,7 +31,7 @@ func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 		users.GET("/", h.getAll)
 		users.PUT("/", h.updateUser)
 		users.GET("/email/:email", h.getByEmail)
-		users.GET("/:id", h.getById)
+		users.GET("/:id", h.getByID)
 		users.DELETE("/:id", h.deleteUser)
 
 	}
@@ -46,16 +46,16 @@ func (h *Handler) getByEmail(c *gin.Context) {
 		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with email %s not found", email))
 	}
 
-	c.JSON(200, user)
+	c.JSON(http.StatusOK, user)
 }
 
-func (h *Handler) getById(c *gin.Context) {
-	id := c.Param("id")
+func (h *Handler) getByID(c *gin.Context) {
+	userID := c.Param("id")
 
-	user, err := h.services.Users.FindById(id)
-
+	user, err := h.services.Users.FindById(userID)
 	if err != nil {
-		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", id))
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", userID))
+		return
 	}
 
 	c.JSON(http.StatusOK, user)
@@ -80,11 +80,13 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Users.SignUp(c.Request.Context(), service.UserSignUpInput{
+	id, err := h.services.Users.SignUp(c.Request.Context(), service.UserSignUpInput{
 		Name:     inp.Name,
 		Email:    inp.Email,
 		Password: inp.Password,
-	}); err != nil {
+	});
+	
+	if err != nil {
 		if errors.Is(err, domain.ErrUserAlreadyExists) {
 			newResponse(c, http.StatusBadRequest, err.Error())
 
@@ -96,7 +98,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusOK, id)
 }
 
 func (h *Handler) userSignIn(c *gin.Context) {
