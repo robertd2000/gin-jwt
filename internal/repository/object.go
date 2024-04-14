@@ -47,14 +47,33 @@ func (repo *ObjectRepo) FindAll() ([]domain.Object, error) {
 	return objects, nil
 }
 
+
+// FindById retrieves an object from the database by its ID.
+//
+// Parameters:
+//   id - the ID of the object to be retrieved.
+//
+// Returns:
+//   *domain.Object - the retrieved object.
+//   error - an error, if any occurred during the retrieval process.
 func (repo *ObjectRepo) FindById(id string) (*domain.Object, error) {
-	obj := new(domain.Object)
-	err := repo.db.Where("id = ?", id).First(obj).Error
-	if err != nil {
+	if id == "" {
+		return nil, errors.New("id can't be empty")
+	}
+	
+	object := &domain.Object{}
+	
+	if err := repo.db.Where("id = ?", id).Take(object).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		
 		return nil, err
 	}
-	return obj, nil
+	
+	return object, nil
 }
+
 
 
 // FindByUserId retrieves all objects belonging to a specific user.
@@ -109,11 +128,25 @@ func (repo *ObjectRepo) Delete(objectId string) error {
 
 
 
+
+// DeleteByUserId removes all objects belonging to a specific user from the
+// database in a single query, rather than one-by-one.
+//
+// Parameters:
+//   userId - the ID of the user whose objects should be deleted.
+//
+// Returns:
+//   error - an error, if any occurred during the deletion process.
 func (repo *ObjectRepo) DeleteByUserId(userId string) error {
-	res := repo.db.Where("user_id = ?", userId).Delete(&domain.Object{})
+	// Use gorm's Unscoped function to bypass the soft delete feature, if
+	// it's enabled, and delete the records in a single query.
+	res := repo.db.Unscoped().Where("user_id = ?", userId).Delete(&domain.Object{})
+
+	// If there were errors, wrap them in a new error and return it.
 	if res.Error != nil {
 		return errors.New(res.Error.Error())
 	}
 
+	// No errors occurred, so return nil.
 	return nil
 }
