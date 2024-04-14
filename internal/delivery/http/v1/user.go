@@ -73,28 +73,20 @@ func (h *Handler) getAll(c *gin.Context) {
 }
 
 func (h *Handler) userSignUp(c *gin.Context) {
-	var inp userSignUpInput
-	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
-
+	var input userSignUpInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, "Invalid input")
 		return
 	}
 
 	id, err := h.services.Users.SignUp(c.Request.Context(), service.UserSignUpInput{
-		Name:     inp.Name,
-		Email:    inp.Email,
-		Password: inp.Password,
-	});
-	
-	if err != nil {
-		if errors.Is(err, domain.ErrUserAlreadyExists) {
-			newResponse(c, http.StatusBadRequest, err.Error())
+		Name:     input.Name,
+		Email:    input.Email,
+		Password: input.Password,
+	})
 
-			return
-		}
-
-		newResponse(c, http.StatusInternalServerError, err.Error())
-
+	if err != nil && !errors.Is(err, domain.ErrUserAlreadyExists) {
+		newResponse(c, http.StatusInternalServerError, "Failed to sign up")
 		return
 	}
 
@@ -151,14 +143,12 @@ func (h *Handler) updateUser(c *gin.Context) {
 }
 
 func (h *Handler) deleteUser(c *gin.Context) {
-	id := c.Param("id")
+	userId := c.Param("id")
 
-	err := h.services.Users.Delete(id)
-
-	if err != nil {
-		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", id))
+	if err := h.services.Users.Delete(userId); err != nil {
+		newResponse(c, http.StatusBadRequest, fmt.Sprintf("User with id %s not found", userId))
+		return
 	}
 
-	c.Status(http.StatusCreated)
-
+	c.Status(http.StatusNoContent)
 }
