@@ -3,25 +3,14 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"go-jwt/internal/delivery/dao"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
-type userSignUpInput struct {
-	Name     string `json:"name" binding:"required,min=2,max=64"`
-	Email    string `json:"email" binding:"required,email,max=64"`
-	Password string `json:"password" binding:"required,min=8,max=64"`
-}
-
-type userUpdateInput struct {
-	ID    uuid.UUID `json:"id" binding:"required"`
-	Name  string    `json:"name" binding:"required,min=2,max=64"`
-	Email string    `json:"email" binding:"required,email,max=64"`
-}
 
 func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
@@ -73,7 +62,7 @@ func (h *Handler) getAll(c *gin.Context) {
 }
 
 func (h *Handler) userSignUp(c *gin.Context) {
-	var input userSignUpInput
+	var input dao.UserSignUpInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		newResponse(c, http.StatusBadRequest, "Invalid input")
 		return
@@ -94,7 +83,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 }
 
 func (h *Handler) userSignIn(c *gin.Context) {
-	var inp userSignUpInput
+	var inp dao.UserSignUpInput
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, "invalid input body")
 
@@ -118,7 +107,7 @@ func (h *Handler) userSignIn(c *gin.Context) {
 }
 
 func (h *Handler) updateUser(c *gin.Context) {
-	var inp userUpdateInput
+	var inp dao.UserUpdateInput
 
 	if err := c.BindJSON(&inp); err != nil {
 		newResponse(c, http.StatusBadRequest, "invalid input body")
