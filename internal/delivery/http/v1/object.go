@@ -2,38 +2,19 @@ package v1
 
 import (
 	"fmt"
+	"go-jwt/internal/delivery/dao"
 	"go-jwt/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
-type objectCreateInput struct {
-	Name        string    `json:"name" binding:"required,min=2,max=64"`
-	Type        int       `json:"type" bson:"type"`
-	Coords      string    `json:"coords" bson:"coords"`
-	Radius      int       `json:"radius" bson:"radius"`
-	Description string    `json:"description" bson:"description"`
-	Color       string    `json:"color" bson:"color"`
-	UserID      uuid.UUID `json:"userId" bson:"userId"`
-}
 
-type objectUpdateInput struct {
-	ID          uuid.UUID `json:"id" bson:"id"`
-	Name        string    `json:"name" binding:"required,min=2,max=64"`
-	Type        int       `json:"type" bson:"type"`
-	Coords      string    `json:"coords" bson:"coords"`
-	Radius      int       `json:"radius" bson:"radius"`
-	Description string    `json:"description" bson:"description"`
-	Color       string    `json:"color" bson:"color"`
-	UserID      uuid.UUID `json:"userId" bson:"userId"`
-}
 
 func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	users := api.Group("/objects")
 	{
-		users.GET("/", h.getObjectsAll)
+		users.GET("/", h.getAllObjects)
 		users.GET("/:id", h.getObjectById)
 		users.GET("/user/:userId", h.getObjectByUserId)
 		users.POST("/", h.createObject)
@@ -42,70 +23,87 @@ func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	}
 }
 
-func (h *Handler) createObject(c *gin.Context) {
-	var object objectCreateInput
 
-	if err := c.BindJSON(&object); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
+// createObject handles the HTTP POST request to create a new object.
+// It expects a JSON body with the object details, and returns a StatusCreated
+// response on success, or an StatusInternalServerError response on error.
+//
+// c *gin.Context: The Gin context object.
+// Returns: None.
+func (h *Handler) createObject(c *gin.Context) (
+) {
+	var input dao.ObjectCreateInput
 
+	if err := c.ShouldBindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, "Invalid input")
 		return
 	}
 
-	if err := h.services.Objects.Create(c.Request.Context(), service.ObjectCreateInput{
-		Name:        object.Name,
-		Type:        object.Type,
-		Coords:      object.Coords,
-		Radius:      object.Radius,
-		Description: object.Description,
-		Color:       object.Color,
-		UserID:      object.UserID,
-	}); err != nil {
+	if err := h.services.Objects.Create(
+		c.Request.Context(), 
+		service.ObjectCreateInput(input),
+	); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
-
 		return
 	}
 
 	c.Status(http.StatusCreated)
 }
 
+
+
+// UpdateObject handles the HTTP PUT request to update an existing object.
+// It expects a JSON body with the object details, and returns a StatusOK
+// response on success, or an StatusInternalServerError response on error.
+//
+// Parameters:
+// - c: The gin.Context object representing the HTTP request.
+//
+// Returns: None.
 func (h *Handler) updateObject(c *gin.Context) {
-	var object objectUpdateInput
-
-	if err := c.BindJSON(&object); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
-
+	var input dao.ObjectUpdateInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		newResponse(c, http.StatusBadRequest, "Invalid input")
 		return
 	}
 
-	if err := h.services.Objects.Update(c.Request.Context(), service.ObjectUpdateInput{
-		ID:          object.ID,
-		Name:        object.Name,
-		Type:        object.Type,
-		Coords:      object.Coords,
-		Radius:      object.Radius,
-		Description: object.Description,
-		Color:       object.Color,
-		UserID:      object.UserID,
-	}); err != nil {
+	if err := h.services.Objects.Update(c.Request.Context(), service.ObjectUpdateInput(input)); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
-
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.Status(http.StatusOK)
 }
 
-func (h *Handler) getObjectsAll(c *gin.Context) {
+
+// GetAllObjects handles the HTTP GET request to retrieve all objects.
+// It returns a StatusOK response with a JSON array of objects on success,
+// or a StatusBadRequest response with an error message on failure.
+//
+// Parameters:
+// - c: The gin.Context object representing the HTTP request.
+//
+// Returns:
+// - None.
+func (h *Handler) getAllObjects(c *gin.Context)  {
 	objects, err := h.services.Objects.FindAll()
-
 	if err != nil {
-		newResponse(c, http.StatusBadRequest, "Objects not found")
+		 newResponse(c, http.StatusBadRequest, "Failed to retrieve objects")
+		 return
+		}
 
-	}
-
-	c.JSON(http.StatusOK, objects)
+	 c.JSON(http.StatusOK, objects)
 }
 
+
+// GetObjectById handles the HTTP GET request to retrieve a specific object.
+// It takes a gin.Context as a parameter and returns a gin.Context.
+//
+// Parameters:
+// - c: The gin.Context representing the HTTP request.
+//
+// Returns:
+// - The modified gin.Context.
 func (h *Handler) getObjectById(c *gin.Context) {
 	id := c.Param("id")
 
@@ -113,6 +111,7 @@ func (h *Handler) getObjectById(c *gin.Context) {
 
 	if err != nil {
 		newResponse(c, http.StatusBadRequest, fmt.Sprintf("Object with id %s not found", id))
+		return
 	}
 
 	c.JSON(http.StatusOK, object)
