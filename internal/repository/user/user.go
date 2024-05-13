@@ -101,7 +101,7 @@ func (repo *UsersRepo) FindByID(id string) (*domain.User, error) {
 // ([]domain.User, error)
 func (repo *UsersRepo) FindAll() ([]domain.User, error) {
 	var users []domain.User
-	err := repo.db.Model(&domain.User{}).Preload("Objects").Select("id, name, email, created, updated").Find(&users).Error
+	err := repo.db.Model(&domain.User{}).Preload("Objects").Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
