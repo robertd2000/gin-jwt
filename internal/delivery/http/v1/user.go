@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go-jwt/internal/delivery/dao"
 	"go-jwt/internal/domain"
-	"go-jwt/internal/service"
+	user_service "go-jwt/internal/service/user"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -67,7 +67,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.Users.SignUp(c.Request.Context(), service.UserSignUpInput{
+	id, err := h.services.Users.SignUp(c.Request.Context(), user_service.UserSignUpInput{
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: input.Password,
@@ -89,7 +89,7 @@ func (h *Handler) userSignIn(c *gin.Context) {
 		return
 	}
 
-	t, err := h.services.Users.SignIn(c.Request.Context(), service.UserSignInInput{
+	t, err := h.services.Users.SignIn(c.Request.Context(), user_service.UserSignInInput{
 		Email:    inp.Email,
 		Password: inp.Password,
 	})
@@ -100,7 +100,7 @@ func (h *Handler) userSignIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, service.UserSignInResponse{
+	c.JSON(http.StatusOK, user_service.UserSignInResponse{
 		Token: t,
 	})
 }
@@ -114,7 +114,7 @@ func (h *Handler) updateUser(c *gin.Context) {
 		return
 	}
 
-	err := h.services.Users.Update(c.Request.Context(), service.UserUpdateInput{
+	err := h.services.Users.Update(c.Request.Context(), user_service.UserUpdateInput{
 		ID:    inp.ID,
 		Name:  inp.Name,
 		Email: inp.Email,

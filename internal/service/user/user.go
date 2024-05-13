@@ -1,4 +1,4 @@
-package service
+package user_service
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	// "github.com/google/uuid"
 )
 
 type UserService struct {
