@@ -33,8 +33,7 @@ func (repo *ObjectRepo) Update(ctx context.Context, obj *domain.Object) error {
 func (repo *ObjectRepo) FindAll() ([]domain.Object, error) {
 	objects := []domain.Object{}
 
-	err := repo.db.Preload("User").Find(&objects).Error
-	if err != nil {
+	if err := repo.db.Preload("User").Find(&objects).Error; err != nil {
 		return nil, err
 	}
 
