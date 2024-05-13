@@ -3,9 +3,16 @@ package user_service
 import (
 	"context"
 	"go-jwt/internal/domain"
+	"go-jwt/internal/pkg/hash"
+	user_repository "go-jwt/internal/repository/user"
 
 	"github.com/google/uuid"
 )
+
+type UserService struct {
+	repo   user_repository.User
+	hasher hash.PasswordHasher
+}
 
 type UserSignUpInput struct {
 	Name     string

@@ -11,11 +11,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type UserService struct {
-	repo   user_repository.User
-	hasher hash.PasswordHasher
-}
-
 func NewUserService(repo user_repository.User, hasher hash.PasswordHasher) *UserService {
 	return &UserService{
 		repo,
@@ -38,7 +33,6 @@ func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) (string
 		Name:     input.Name,
 		Password: passwordHash,
 		Email:    input.Email,
-		// ID:       uuid.New(), // Generate a new UUID
 	}
 
 	// Save the user to the repository
@@ -102,7 +96,7 @@ func (s *UserService) Update(ctx context.Context, input UserUpdateInput) error {
 	}
 
 	err = s.repo.Update(ctx, &domain.User{
-		// ID:       user.ID,
+		ID:       user.ID,
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: user.Password,
