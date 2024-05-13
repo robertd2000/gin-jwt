@@ -5,5 +5,8 @@ import "go-jwt/internal/app"
 const configsDir = "configs"
 
 func main() {
-	app.Init()
+	a := app.App{}
+
+	a.Initialize(configsDir)
+	a.Run()
 }
