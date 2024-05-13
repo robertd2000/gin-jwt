@@ -3,13 +3,11 @@ package v1
 import (
 	"fmt"
 	"go-jwt/internal/delivery/dao"
-	"go-jwt/internal/service"
+	object_service "go-jwt/internal/service/object"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-
 
 func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	users := api.Group("/objects")
@@ -23,15 +21,13 @@ func (h *Handler) initObjectsRoutes(api *gin.RouterGroup) {
 	}
 }
 
-
 // createObject handles the HTTP POST request to create a new object.
 // It expects a JSON body with the object details, and returns a StatusCreated
 // response on success, or an StatusInternalServerError response on error.
 //
 // c *gin.Context: The Gin context object.
 // Returns: None.
-func (h *Handler) createObject(c *gin.Context) (
-) {
+func (h *Handler) createObject(c *gin.Context) {
 	var input dao.ObjectCreateInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -40,8 +36,8 @@ func (h *Handler) createObject(c *gin.Context) (
 	}
 
 	if err := h.services.Objects.Create(
-		c.Request.Context(), 
-		service.ObjectCreateInput(input),
+		c.Request.Context(),
+		object_service.ObjectCreateInput(input),
 	); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -49,8 +45,6 @@ func (h *Handler) createObject(c *gin.Context) (
 
 	c.Status(http.StatusCreated)
 }
-
-
 
 // UpdateObject handles the HTTP PUT request to update an existing object.
 // It expects a JSON body with the object details, and returns a StatusOK
@@ -67,14 +61,13 @@ func (h *Handler) updateObject(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Objects.Update(c.Request.Context(), service.ObjectUpdateInput(input)); err != nil {
+	if err := h.services.Objects.Update(c.Request.Context(), object_service.ObjectUpdateInput(input)); err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.Status(http.StatusOK)
 }
-
 
 // GetAllObjects handles the HTTP GET request to retrieve all objects.
 // It returns a StatusOK response with a JSON array of objects on success,
@@ -85,16 +78,15 @@ func (h *Handler) updateObject(c *gin.Context) {
 //
 // Returns:
 // - None.
-func (h *Handler) getAllObjects(c *gin.Context)  {
+func (h *Handler) getAllObjects(c *gin.Context) {
 	objects, err := h.services.Objects.FindAll()
 	if err != nil {
-		 newResponse(c, http.StatusBadRequest, "Failed to retrieve objects")
-		 return
-		}
+		newResponse(c, http.StatusBadRequest, "Failed to retrieve objects")
+		return
+	}
 
-	 c.JSON(http.StatusOK, objects)
+	c.JSON(http.StatusOK, objects)
 }
-
 
 // GetObjectById handles the HTTP GET request to retrieve a specific object.
 // It takes a gin.Context as a parameter and returns a gin.Context.

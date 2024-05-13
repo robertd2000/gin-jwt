@@ -1,20 +1,15 @@
-package service
+package object_service
 
 import (
 	"context"
 	"go-jwt/internal/domain"
-	"go-jwt/internal/repository"
+	object_repository "go-jwt/internal/repository/object"
 	user_repository "go-jwt/internal/repository/user"
 
 	"github.com/google/uuid"
 )
 
-type ObjectService struct {
-	objectRepo repository.Object
-	userRepo   user_repository.User
-}
-
-func NewObjectService(objectRepo repository.Object, userEepo user_repository.User) *ObjectService {
+func NewObjectService(objectRepo object_repository.Object, userEepo user_repository.User) *ObjectService {
 	return &ObjectService{
 		objectRepo,
 		userEepo,
