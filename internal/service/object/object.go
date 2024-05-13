@@ -5,8 +5,6 @@ import (
 	"go-jwt/internal/domain"
 	object_repository "go-jwt/internal/repository/object"
 	user_repository "go-jwt/internal/repository/user"
-
-	"github.com/google/uuid"
 )
 
 func NewObjectService(objectRepo object_repository.Object, userEepo user_repository.User) *ObjectService {
@@ -29,7 +27,6 @@ func (s *ObjectService) Create(ctx context.Context, input ObjectCreateInput) err
 
 	// Create a new object with the provided input data
 	object := domain.Object{
-		ID:          uuid.New(), // Generate a new UUID
 		Name:        input.Name,
 		Type:        input.Type,
 		Coords:      input.Coords,
