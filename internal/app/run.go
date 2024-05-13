@@ -22,7 +22,6 @@ func (a *App) Run() {
 
 	logger.Info("Server started")
 
-	// Graceful Shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 

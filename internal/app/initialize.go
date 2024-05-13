@@ -10,21 +10,22 @@ import (
 	"go-jwt/internal/service"
 )
 
-func (a *App) Initialize() {
-	cfg, err := config.Init("configs")
+func (a *App) Initialize(configsDir string) {
+	cfg, err := config.Init(configsDir)
 	if err != nil {
 		print("error")
 	}
 
 	initializers.LoadEnv()
+
 	a.DB = initializers.ConnectToDb()
 	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
-
 	repos := repository.NewRepositories(a.DB)
 	services := service.NewServices(service.Deps{
 		Repos:  repos,
 		Hasher: hasher,
 	})
 	handlers := delivery.NewHandler(services)
+
 	a.Server = server.NewServer(cfg, handlers.Init(cfg))
 }
