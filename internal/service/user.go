@@ -4,21 +4,20 @@ import (
 	"context"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/pkg/hash"
-	"go-jwt/internal/repository"
+	user_repository "go-jwt/internal/repository/user"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-
-	"github.com/google/uuid"
+	// "github.com/google/uuid"
 )
 
 type UserService struct {
-	repo   repository.User
+	repo   user_repository.User
 	hasher hash.PasswordHasher
 }
 
-func NewUserService(repo repository.User, hasher hash.PasswordHasher) *UserService {
+func NewUserService(repo user_repository.User, hasher hash.PasswordHasher) *UserService {
 	return &UserService{
 		repo,
 		hasher,
@@ -32,23 +31,23 @@ func (s *UserService) SignUp(ctx context.Context, input UserSignUpInput) (string
 	// Hash the password
 	passwordHash, err := s.hasher.Hash(input.Password)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 
 	// Create a new user domain object
-	student := domain.User{
+	user := domain.User{
 		Name:     input.Name,
 		Password: passwordHash,
 		Email:    input.Email,
-		ID:       uuid.New(), // Generate a new UUID
+		// ID:       uuid.New(), // Generate a new UUID
 	}
 
 	// Save the user to the repository
 
-	id, err := s.repo.Create(ctx, &student)
+	id, err := s.repo.Create(ctx, &user)
 
 	if err != nil {
-		return "",err
+		return "", err
 	}
 
 	return id.String(), nil
@@ -104,7 +103,7 @@ func (s *UserService) Update(ctx context.Context, input UserUpdateInput) error {
 	}
 
 	err = s.repo.Update(ctx, &domain.User{
-		ID:       user.ID,
+		// ID:       user.ID,
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: user.Password,

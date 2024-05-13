@@ -4,16 +4,17 @@ import (
 	"context"
 	"go-jwt/internal/domain"
 	"go-jwt/internal/repository"
+	user_repository "go-jwt/internal/repository/user"
 
 	"github.com/google/uuid"
 )
 
 type ObjectService struct {
 	objectRepo repository.Object
-	userRepo   repository.User
+	userRepo   user_repository.User
 }
 
-func NewObjectService(objectRepo repository.Object, userEepo repository.User) *ObjectService {
+func NewObjectService(objectRepo repository.Object, userEepo user_repository.User) *ObjectService {
 	return &ObjectService{
 		objectRepo,
 		userEepo,

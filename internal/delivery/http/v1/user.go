@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func (h *Handler) initUsersRoutes(api *gin.RouterGroup) {
 	users := api.Group("/users")
 	{
@@ -75,7 +74,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 	})
 
 	if err != nil && !errors.Is(err, domain.ErrUserAlreadyExists) {
-		newResponse(c, http.StatusInternalServerError, "Failed to sign up")
+		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 

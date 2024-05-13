@@ -3,20 +3,10 @@ package repository
 import (
 	"context"
 	"go-jwt/internal/domain"
+	user_repository "go-jwt/internal/repository/user"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
-
-type User interface {
-	Create(ctx context.Context, user *domain.User) (uuid.UUID, error)
-	Update(_ context.Context, user *domain.User) error
-	FindAll() ([]domain.User, error)
-	FindByEmail(email string) (*domain.User, error)
-	FindByID(id string) (*domain.User, error)
-	AddObject(user domain.User, object domain.Object) error
-	Delete(userId string) error
-}
 
 type Object interface {
 	Create(c context.Context, object *domain.Object) error
@@ -29,7 +19,7 @@ type Object interface {
 }
 
 type Repositories struct {
-	User
+	User user_repository.User
 	Object
 }
 
@@ -37,7 +27,9 @@ func NewRepositories(db *gorm.DB) *Repositories {
 	db.AutoMigrate(&domain.User{}, &domain.Object{})
 
 	return &Repositories{
-		NewUsersRepo(db),
-		NewObjectRepo(db),
+		User:   user_repository.NewUsersRepo(db),
+		Object: NewObjectRepo(db),
+		//  user.NewUsersRepo(db),
+		// 	NewObjectRepo(db),
 	}
 }
