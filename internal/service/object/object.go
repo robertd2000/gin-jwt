@@ -5,6 +5,8 @@ import (
 	"go-jwt/internal/domain"
 	object_repository "go-jwt/internal/repository/object"
 	user_repository "go-jwt/internal/repository/user"
+
+	"github.com/google/uuid"
 )
 
 func NewObjectService(objectRepo object_repository.Object, userEepo user_repository.User) *ObjectService {
@@ -18,11 +20,11 @@ func NewObjectService(objectRepo object_repository.Object, userEepo user_reposit
 //
 // The function takes a context and an ObjectCreateInput struct as parameters.
 // It returns an error if any of the underlying repository methods fail.
-func (s *ObjectService) Create(ctx context.Context, input ObjectCreateInput) error {
+func (s *ObjectService) Create(ctx context.Context, input ObjectCreateInput) (uuid.UUID, error) {
 	// Find the user by their ID
 	user, err := s.userRepo.FindByID(input.UserID.String())
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
 
 	// Create a new object with the provided input data
@@ -39,15 +41,16 @@ func (s *ObjectService) Create(ctx context.Context, input ObjectCreateInput) err
 
 	// Add the object to the user in the user repository
 	if err := s.userRepo.AddObject(*user, object); err != nil {
-		return err
+		return uuid.Nil, err
 	}
 
 	// Create the object in the object repository
-	if err := s.objectRepo.Create(ctx, &object); err != nil {
-		return err
+	id, err := s.objectRepo.Create(ctx, &object)
+	if err != nil {
+		return uuid.Nil, err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (s *ObjectService) Update(ctx context.Context, objectInput ObjectUpdateInput) error {

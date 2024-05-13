@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go-jwt/internal/domain"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -15,11 +16,11 @@ func NewObjectRepo(db *gorm.DB) *ObjectRepo {
 }
 
 // Create saves a new object to the database.
-func (r *ObjectRepo) Create(ctx context.Context, obj *domain.Object) error {
+func (r *ObjectRepo) Create(ctx context.Context, obj *domain.Object) (uuid.UUID, error) {
 	if err := r.db.Create(obj).Error; err != nil {
-		return err
+		return uuid.Nil, err
 	}
-	return nil
+	return obj.ID, nil
 }
 
 // Update updates an existing object in the database.

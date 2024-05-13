@@ -36,7 +36,7 @@ type ObjectUpdateInput struct {
 }
 
 type Objects interface {
-	Create(ctx context.Context, objectInput ObjectCreateInput) error
+	Create(ctx context.Context, objectInput ObjectCreateInput) (uuid.UUID, error)
 	Update(ctx context.Context, objectInput ObjectUpdateInput) error
 	FindAll() ([]domain.Object, error)
 	FindById(id string) (*domain.Object, error)

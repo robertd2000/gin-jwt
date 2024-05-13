@@ -35,15 +35,16 @@ func (h *Handler) createObject(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.Objects.Create(
+	id, err := h.services.Objects.Create(
 		c.Request.Context(),
 		object_service.ObjectCreateInput(input),
-	); err != nil {
+	)
+	if err != nil {
 		newResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusOK, id)
 }
 
 // UpdateObject handles the HTTP PUT request to update an existing object.
