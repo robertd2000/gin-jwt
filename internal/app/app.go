@@ -17,29 +17,37 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"gorm.io/gorm"
 )
 
-func Init() {
+type App struct {
+	Server *server.Server
+	DB     *gorm.DB
+}
+
+func (a *App) Initialize() {
 	cfg, err := config.Init("configs")
 	if err != nil {
 		print("error")
 	}
 
 	initializers.LoadEnv()
-	db := initializers.ConnectToDb()
+	a.DB = initializers.ConnectToDb()
 	hasher := hash.NewSHA1Hasher(cfg.Auth.PasswordSalt)
 
-	repos := repository.NewRepositories(db)
+	repos := repository.NewRepositories(a.DB)
 	services := service.NewServices(service.Deps{
 		Repos:  repos,
 		Hasher: hasher,
 	})
 	handlers := delivery.NewHandler(services)
+	a.Server = server.NewServer(cfg, handlers.Init(cfg))
+}
 
-	srv := server.NewServer(cfg, handlers.Init(cfg))
-
+func (a *App) Run() {
 	go func() {
-		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
+		if err := a.Server.Run(); !errors.Is(err, http.ErrServerClosed) {
 			fmt.Errorf("error occurred while running http server: %s\n", err.Error())
 		}
 	}()
@@ -57,7 +65,14 @@ func Init() {
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
 
-	if err := srv.Stop(ctx); err != nil {
+	if err := a.Server.Stop(ctx); err != nil {
 		logger.Errorf("failed to stop server: %v", err)
 	}
+}
+
+func Init() {
+	app := App{}
+
+	app.Initialize()
+	app.Run()
 }
