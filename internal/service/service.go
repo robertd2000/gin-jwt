@@ -5,30 +5,10 @@ import (
 	"go-jwt/internal/domain"
 	"go-jwt/internal/pkg/hash"
 	"go-jwt/internal/repository"
+	user_service "go-jwt/internal/service/user"
 
 	"github.com/google/uuid"
 )
-
-type UserSignUpInput struct {
-	Name     string
-	Email    string
-	Password string
-}
-
-type UserSignInInput struct {
-	Email    string
-	Password string
-}
-
-type UserUpdateInput struct {
-	ID    uuid.UUID
-	Email string
-	Name  string
-}
-
-type UserSignInResponse struct {
-	Token string
-}
 
 type ObjectCreateInput struct {
 	Name        string
@@ -51,16 +31,6 @@ type ObjectUpdateInput struct {
 	UserID      uuid.UUID
 }
 
-type Users interface {
-	SignUp(ctx context.Context, input UserSignUpInput) (string, error)
-	SignIn(ctx context.Context, input UserSignInInput) (string, error)
-	FindAll() ([]domain.User, error)
-	FindByEmail(email string) (*domain.User, error)
-	FindById(id string) (*domain.User, error)
-	Update(ctx context.Context, input UserUpdateInput) error
-	Delete(userId string) error
-}
-
 type Objects interface {
 	Create(ctx context.Context, objectInput ObjectCreateInput) error
 	Update(ctx context.Context, objectInput ObjectUpdateInput) error
@@ -71,7 +41,7 @@ type Objects interface {
 }
 
 type Services struct {
-	Users   Users
+	Users   user_service.Users
 	Objects Objects
 }
 
@@ -81,7 +51,7 @@ type Deps struct {
 }
 
 func NewServices(deps Deps) *Services {
-	userService := NewUserService(deps.Repos.User, deps.Hasher)
+	userService := user_service.NewUserService(deps.Repos.User, deps.Hasher)
 	objectService := NewObjectService(deps.Repos.Object, deps.Repos.User)
 	return &Services{
 		Users:   userService,
